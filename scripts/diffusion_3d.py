@@ -44,7 +44,7 @@ def wiener_process(T, N):
     W = np.cumsum(dW)
     W = np.insert(W, 0, 0)  # Insert W_0 = 0 at the beginning
 
-    return W
+    return W[:-1]
 
 # Create each line one after the other in a loop
 for i in range(50):
