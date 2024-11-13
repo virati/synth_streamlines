@@ -49,7 +49,7 @@ y = np.hstack(y)
 z = np.hstack(z)
 s = np.hstack(s)
 connections = np.vstack(connections)
-
+print(f"{x.shape} vs {y.shape} vs {z.shape} vs {s.shape}")
 # Create the points
 src = mlab.pipeline.scalar_scatter(x, y, z, s)
 

@@ -1,3 +1,4 @@
+#%%
 # Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
 # Copyright (c) 2010, Enthought
 # License: BSD style
@@ -25,11 +26,31 @@ connections = list()
 # The index of the current point in the total amount of points
 index = 0
 
+#%%
+def wiener_process(T, N):
+    """
+    Simulates a Wiener process.
+
+    Parameters:
+        T (float): Time horizon.
+        N (int): Number of time steps.
+
+    Returns:
+        numpy.ndarray: Array of Wiener process values.
+    """
+
+    dt = T / N
+    dW = np.sqrt(dt) * np.random.normal(0, 1, N)
+    W = np.cumsum(dW)
+    W = np.insert(W, 0, 0)  # Insert W_0 = 0 at the beginning
+
+    return W
+
 # Create each line one after the other in a loop
 for i in range(50):
-    x.append(np.sin(t))
-    y.append(np.cos((2 + .02 * i) * t))
-    z.append(np.cos((3 + .02 * i) * t))
+    x.append(wiener_process(1,len(t)))
+    z.append(wiener_process(1,len(t)))
+    y.append(wiener_process(1,len(t)))
     s.append(t)
     # This is the tricky part: in a line, each point is connected
     # to the one following it. We have to express this with the indices
@@ -43,13 +64,14 @@ for i in range(50):
     index += N
 
 # Now collapse all positions, scalars and connections in big arrays
-x = np.hstack(x)
-y = np.hstack(y)
-z = np.hstack(z)
-s = np.hstack(s)
+x = np.hstack(x).squeeze()
+y = np.hstack(y).squeeze()
+z = np.hstack(z).squeeze()
+s = np.hstack(s).squeeze()
 connections = np.vstack(connections)
 
 # Create the points
+print(f"{x.shape} vs {y.shape} vs {z.shape} vs {s.shape}")
 src = mlab.pipeline.scalar_scatter(x, y, z, s)
 
 # Connect them
