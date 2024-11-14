@@ -4,6 +4,7 @@
 # License: BSD style
 
 import numpy as np
+from aleatory.processes import BrownianBridge
 
 # The number of points per line
 N = 300
@@ -27,7 +28,7 @@ connections = list()
 index = 0
 
 #%%
-def wiener_process(T, N):
+def wiener_process(T, N, **kwargs):
     """
     Simulates a Wiener process.
 
@@ -46,12 +47,31 @@ def wiener_process(T, N):
 
     return W[:-1]
 
+def brownbridge_process(T,N,num_paths=1, base_curve = False):
+    process = BrownianBridge(initial=-2,end=2)
+    paths = process.simulate(n=N, N=num_paths)
+    if base_curve:
+        tvec = np.linspace(0,0.25, N)
+        
+        paths = [path + np.sin(2 * np.pi * 1 * tvec) for path in paths]
+
+    print(len(paths))
+    return paths
+
+diffusion_style = 'brownbridge'
 # Create each line one after the other in a loop
-for i in range(50):
-    x.append(wiener_process(1,len(t)))
-    z.append(wiener_process(1,len(t)))
-    y.append(wiener_process(1,len(t)))
-    s.append(t)
+if diffusion_style == 'wiener':
+    diff_func = wiener_process
+elif diffusion_style == 'brownbridge':
+    diff_func = brownbridge_process
+
+for i in range(2):
+    x.append(diff_func(1,len(t)))
+    z.append(diff_func(1,len(t)))
+    y.append(diff_func(1,len(t)))
+    #s.append(t) #each streamline has time color gradient
+    s.append(i * np.ones_like(t)) #color each streamline different
+
     # This is the tricky part: in a line, each point is connected
     # to the one following it. We have to express this with the indices
     # of the final set of points once all lines have been combined
@@ -88,3 +108,7 @@ mlab.pipeline.surface(lines, colormap='Accent', line_width=1, opacity=.4)
 mlab.view(33.6, 106, 5.5, [0, 0, .05])
 mlab.roll(125)
 mlab.show()
+#%%
+import matplotlib.pyplot as plt
+
+plt.plot(x[0,...])
