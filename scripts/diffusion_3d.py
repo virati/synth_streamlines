@@ -53,7 +53,7 @@ def brownbridge_process(T,N,num_paths=1, base_curve = False):
     if base_curve:
         tvec = np.linspace(0,0.25, N)
         
-        paths = [path + np.sin(2 * np.pi * 1 * tvec) for path in paths]
+        paths = [path + 2*np.sin(2 * np.pi * 1 * tvec) for path in paths]
 
     print(len(paths))
     return paths
@@ -68,7 +68,7 @@ elif diffusion_style == 'brownbridge':
 for i in range(2):
     x.append(diff_func(1,len(t)))
     z.append(diff_func(1,len(t)))
-    y.append(diff_func(1,len(t)))
+    y.append(diff_func(1,len(t),base_curve=True))
     #s.append(t) #each streamline has time color gradient
     s.append(i * np.ones_like(t)) #color each streamline different
 
