@@ -40,7 +40,7 @@ class bundle:
         b=None,
         num_streamlines=5,
         do_plot=False,
-        tortuosity=1.0,
+        tortuosity=0.01,
         noise_level=0.1,
     ):
         # Example usage
