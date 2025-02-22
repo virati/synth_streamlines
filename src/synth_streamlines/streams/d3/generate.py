@@ -2,7 +2,6 @@ import numpy as np
 from scipy.interpolate import make_interp_spline
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.patches as patches
 
 
 class bundle:
@@ -18,9 +17,16 @@ class bundle:
             z_points = (1 - t) * a[2] + t * b[2] + noise_level * np.random.randn(len(t))
 
             # Apply tortuosity transformation
-            x_points = np.interp(t, t, x_points + tortuosity * np.sin(2 * np.pi * t))
-            y_points = np.interp(t, t, y_points + tortuosity * np.sin(2 * np.pi * t))
-            z_points = np.interp(t, t, z_points + tortuosity * np.sin(2 * np.pi * t))
+            if tortuosity > 0:
+                x_points = np.interp(
+                    t, t, x_points + tortuosity * np.sin(2 * np.pi * t)
+                )
+                y_points = np.interp(
+                    t, t, y_points + tortuosity * np.sin(2 * np.pi * t)
+                )
+                z_points = np.interp(
+                    t, t, z_points + tortuosity * np.sin(2 * np.pi * t)
+                )
 
             t_new = np.linspace(0, 1, 100)
             x_spline = make_interp_spline(t, x_points, k=3)(t_new)
@@ -69,14 +75,22 @@ class bundle:
         ax = fig.add_subplot(111, projection="3d")
         for ss, (x_spline, y_spline, z_spline) in enumerate(streamlines):
             ax.plot(x_spline, y_spline, z_spline, label=f"s{ss}")
-        probe_sphere = patches.Circle(
-            (x, y), r, edgecolor="r", facecolor="none", linestyle="--"
-        )
-        ax.add_patch(probe_sphere)
+
+        # Create a sphere for the probe point
+        u, v = np.linspace(0, 2 * np.pi, 100), np.linspace(0, np.pi, 100)
+        u, v = np.meshgrid(u, v)
+        x_sphere = x + r * np.cos(u) * np.sin(v)
+        y_sphere = y + r * np.sin(u) * np.sin(v)
+        z_sphere = z + r * np.cos(v)
+
+        ax.plot_wireframe(x_sphere, y_sphere, z_sphere, color="r", linestyle="--")
+
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
         ax.set_zlabel("Z")
+
         ax.set_title("Generated Streamlines with Probe Point")
+        ax.set_aspect("equal")
         plt.legend()
         plt.show()
 
