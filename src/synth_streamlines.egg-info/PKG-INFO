@@ -1,0 +1,21 @@
+Metadata-Version: 2.2
+Name: synth-streamlines
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: matplotlib>=3.10.0
+Requires-Dist: numpy>=2.2.2
+
+# SynthStreamlines
+A library for synthetic tractography + neuronal networks + behavioral diffeomorphisms.
+
+## Overview
+
+## Running Mayavi
+Mayavi has issues with Wayland.
+To run anything that uses Mayavi, the kludge way is to tell Qt to force-use X11
+
+``` export QT_QPA_PLATFORM=xcb```
+
+Before running any script.
