@@ -59,8 +59,8 @@ class bundle:
 
     def plot_streamlines_with_probe(self, streamlines, x, y, r):
         fig, ax = plt.subplots()
-        for x_spline, y_spline in streamlines:
-            ax.plot(x_spline, y_spline)
+        for ss, (x_spline, y_spline) in enumerate(streamlines):
+            ax.plot(x_spline, y_spline, label=f"s{ss}")
         probe_circle = patches.Circle(
             (x, y), r, edgecolor="r", facecolor="none", linestyle="--"
         )
@@ -68,6 +68,7 @@ class bundle:
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.title("Generated Streamlines with Probe Point")
+        plt.legend()
         plt.show()
 
 
