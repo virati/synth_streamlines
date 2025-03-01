@@ -1,3 +1,4 @@
+# %%
 """
 ==================================
 Advanced interactive visualization
@@ -15,6 +16,7 @@ import numpy as np
 from dipy.data.fetcher import fetch_bundles_2_subjects, read_bundles_2_subjects
 from dipy.tracking.streamline import Streamlines
 from dipy.viz import actor, ui, window
+import nibabel as nib
 
 ###############################################################################
 # In ``window`` we have all the objects that connect what needs to be rendered
@@ -52,10 +54,33 @@ res = read_bundles_2_subjects(
 ###############################################################################
 # We will use 3 bundles, FA and the affine transformation that brings the voxel
 # coordinates to world coordinates (RAS 1mm).
+# %%
+# Bring in your trk
+custom_trk_path = "/home/virati/Data/postdoc/um1/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
+trk_file = nib.streamlines.load(custom_trk_path)
+header = trk_file.header
+custom_streamlines = trk_file.streamlines
+# %%
+N = 1000  # Number of streamlines to randomly choose
+random_indices = np.random.choice(len(custom_streamlines), N, replace=False)
+ds_custom_streamlines = [custom_streamlines[ii] for ii in random_indices]
 
-streamlines = Streamlines(res["af.left"])
-streamlines.extend(res["cst.right"])
-streamlines.extend(res["cc_1"])
+
+def shift_streamlines(streamlines, shift_x, shift_y, shift_z):
+    for streamline in streamlines:
+        for point in streamline:
+            point[0] += shift_x
+            point[1] += shift_y
+            point[2] += shift_z
+    return streamlines
+
+
+ds_custom_streamlines = shift_streamlines(ds_custom_streamlines, 0, 35, 34)
+streamlines = Streamlines(ds_custom_streamlines)
+# streamlines.extend(ds_custom_streamlines)
+# streamlines = Streamlines(res["af.left"])
+# streamlines.extend(res["cst.right"])
+# streamlines.extend(res["cc_1"])
 
 data = res["fa"]
 shape = data.shape
@@ -293,3 +318,5 @@ del show_m
 ###############################################################################
 # .. include:: ../../links_names.inc
 #
+
+# %%
