@@ -18,6 +18,24 @@ from dipy.tracking.streamline import Streamlines
 from dipy.viz import actor, ui, window
 import nibabel as nib
 
+
+def shift_streamlines(streamlines, shift_x, shift_y, shift_z):
+    for streamline in streamlines:
+        for point in streamline:
+            point[0] += shift_x
+            point[1] += shift_y
+            point[2] += shift_z
+    return streamlines
+
+
+def get_distances(streamlines, center_point):
+    distances = []
+    for streamline in streamlines:
+        for point in streamline:
+            distances.append(np.linalg.norm(point - center_point))
+    return distances
+
+
 ###############################################################################
 # In ``window`` we have all the objects that connect what needs to be rendered
 # to the display or the disk e.g., for saving screenshots. So, there you will
@@ -40,7 +58,15 @@ import nibabel as nib
 #
 # First we need to fetch and load some datasets.
 
-fetch_bundles_2_subjects()
+use_sample_data = False
+if use_sample_data:
+    fetch_bundles_2_subjects()
+else:
+    custom_trk_path = "/home/virati/Data/postdoc/um1/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
+    trk_file = nib.streamlines.load(custom_trk_path)
+    header = trk_file.header
+    custom_streamlines = trk_file.streamlines
+
 
 ###############################################################################
 # The following function outputs a dictionary with the required bundles e.g.
@@ -56,24 +82,10 @@ res = read_bundles_2_subjects(
 # coordinates to world coordinates (RAS 1mm).
 # %%
 # Bring in your trk
-custom_trk_path = "/home/virati/Data/postdoc/um1/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
-trk_file = nib.streamlines.load(custom_trk_path)
-header = trk_file.header
-custom_streamlines = trk_file.streamlines
 # %%
 N = 1000  # Number of streamlines to randomly choose
 random_indices = np.random.choice(len(custom_streamlines), N, replace=False)
 ds_custom_streamlines = [custom_streamlines[ii] for ii in random_indices]
-
-
-def shift_streamlines(streamlines, shift_x, shift_y, shift_z):
-    for streamline in streamlines:
-        for point in streamline:
-            point[0] += shift_x
-            point[1] += shift_y
-            point[2] += shift_z
-    return streamlines
-
 
 ds_custom_streamlines = shift_streamlines(ds_custom_streamlines, 0, 35, 34)
 streamlines = Streamlines(ds_custom_streamlines)
