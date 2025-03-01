@@ -20,10 +20,10 @@ class StreamlineVisualizer:
 
     def load_tractogram(self):
         tractogram = load_tractogram(self.trk_file, "same")
+        self._tractogram = tractogram
         self.streamlines = tractogram.streamlines
         self.data = tractogram.data_per_point
         self.affine = tractogram.affine
-        self.shape = self.data.shape
 
     def setup_scene(self):
         stream_actor = actor.line(self.streamlines)
