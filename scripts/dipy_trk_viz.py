@@ -1,4 +1,4 @@
-# %%
+# %% Imports and Methods
 """
 ==================================
 Advanced interactive visualization
@@ -28,14 +28,28 @@ def shift_streamlines(streamlines, shift_x, shift_y, shift_z):
     return streamlines
 
 
-def get_distances(streamlines, center_point):
-    distances = []
+def mirror_streamlines(streamlines, axis, do_copy=True):
+    if do_copy:
+        streamlines = streamlines.copy()
+
     for streamline in streamlines:
         for point in streamline:
-            distances.append(np.linalg.norm(point - center_point))
-    return distances
+            point[axis] = -point[axis]
+    return streamlines
 
 
+def get_min_distances(streamlines, center_point):
+    stream_min_distances = []
+    for streamline in streamlines:
+        stream_pointwise_distances = []
+        for point in streamline:
+            stream_pointwise_distances.append(np.linalg.norm(point - center_point))
+        stream_min_distances.append(np.min(stream_pointwise_distances))
+
+    return stream_min_distances
+
+
+# %% Data Loading
 ###############################################################################
 # In ``window`` we have all the objects that connect what needs to be rendered
 # to the display or the disk e.g., for saving screenshots. So, there you will
@@ -57,15 +71,16 @@ def get_distances(streamlines, center_point):
 # a ``LineSlider2D`` widget.
 #
 # First we need to fetch and load some datasets.
-
+trk_file = None
 use_sample_data = False
 if use_sample_data:
     fetch_bundles_2_subjects()
 else:
     custom_trk_path = "/home/virati/Data/postdoc/um1/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
-    trk_file = nib.streamlines.load(custom_trk_path)
-    header = trk_file.header
-    custom_streamlines = trk_file.streamlines
+    if trk_file is None:
+        trk_file = nib.streamlines.load(custom_trk_path)
+        header = trk_file.header
+        custom_streamlines = trk_file.streamlines
 
 
 ###############################################################################
@@ -80,17 +95,25 @@ res = read_bundles_2_subjects(
 ###############################################################################
 # We will use 3 bundles, FA and the affine transformation that brings the voxel
 # coordinates to world coordinates (RAS 1mm).
-# %%
-# Bring in your trk
-# %%
+# %% Downsample and Shifts/Mirrors
 N = 1000  # Number of streamlines to randomly choose
 random_indices = np.random.choice(len(custom_streamlines), N, replace=False)
 ds_custom_streamlines = [custom_streamlines[ii] for ii in random_indices]
 
-ds_custom_streamlines = shift_streamlines(ds_custom_streamlines, 0, 35, 34)
+ds_custom_streamlines = mirror_streamlines(ds_custom_streamlines, 0, do_copy=False)
+# ds_custom_streamlines = shift_streamlines(ds_custom_streamlines, 0, 35, 34)
+
+
+electrode_position = (0.0, 0.0, 0.0)
+stream_distances = get_min_distances(ds_custom_streamlines, electrode_position)
+
+
+# %% Plotting
+# Setup the registration and plotting
 streamlines = Streamlines(ds_custom_streamlines)
 # streamlines.extend(ds_custom_streamlines)
 # streamlines = Streamlines(res["af.left"])
+streamlines.extend(res["af.left"])
 # streamlines.extend(res["cst.right"])
 # streamlines.extend(res["cc_1"])
 
