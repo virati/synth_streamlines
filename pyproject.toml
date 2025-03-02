@@ -13,5 +13,6 @@ dependencies = [
     "nipype>=1.9.2",
     "numpy>=2.2.2",
     "pyqt6>=6.8.1",
+    "pyvista>=0.44.2",
     "scipy>=1.15.2",
 ]
