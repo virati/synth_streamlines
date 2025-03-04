@@ -76,7 +76,7 @@ use_sample_data = False
 if use_sample_data:
     fetch_bundles_2_subjects()
 else:
-    custom_trk_path = "/home/virati/Data/postdoc/um1/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
+    custom_trk_path = "/home/virati/Data/postdoc/um1/linc_ome/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
     if trk_file is None:
         trk_file = nib.streamlines.load(custom_trk_path)
         header = trk_file.header
@@ -100,7 +100,7 @@ N = 1000  # Number of streamlines to randomly choose
 random_indices = np.random.choice(len(custom_streamlines), N, replace=False)
 ds_custom_streamlines = [custom_streamlines[ii] for ii in random_indices]
 
-ds_custom_streamlines = mirror_streamlines(ds_custom_streamlines, 0, do_copy=False)
+# ds_custom_streamlines = mirror_streamlines(ds_custom_streamlines, 0, do_copy=False)
 # ds_custom_streamlines = shift_streamlines(ds_custom_streamlines, 0, 35, 34)
 
 
