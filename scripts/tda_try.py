@@ -54,7 +54,7 @@ res = read_bundles_2_subjects(
     subj_id="subj_1", metrics=["t1", "fa"], bundles=["af.left", "cst.right", "cc_1"]
 )
 # %% Downsample and Shifts/Mirrors
-N = 5  # Number of streamlines to randomly choose
+N = 15  # Number of streamlines to randomly choose
 random_indices = np.random.choice(len(custom_streamlines), N, replace=False)
 ds_custom_streamlines = [custom_streamlines[ii] for ii in random_indices]
 
