@@ -10,7 +10,9 @@ but tailored to the needs of structural and diffusion imaging.
 
 Let's start by importing the necessary modules.
 """
+use_trk_path = "/data/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
 
+#%%
 import numpy as np
 
 from dipy.data.fetcher import fetch_bundles_2_subjects, read_bundles_2_subjects
@@ -76,7 +78,7 @@ use_sample_data = False
 if use_sample_data:
     fetch_bundles_2_subjects()
 else:
-    custom_trk_path = "/home/virati/Data/postdoc/um1/linc_ome/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
+    custom_trk_path = use_trk_path
     if trk_file is None:
         trk_file = nib.streamlines.load(custom_trk_path)
         header = trk_file.header

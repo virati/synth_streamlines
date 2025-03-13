@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/devcontainers/python:1-${VARIANT}
 
 # System Updates
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 # Update pip
 RUN pip install --upgrade pip
