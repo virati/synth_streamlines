@@ -1,9 +1,10 @@
-
+#%%
 # Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
 # Copyright (c) 2010, Enthought
 # License: BSD style
 
 import numpy as np
+from aleatory.processes import BrownianBridge
 
 # The number of points per line
 N = 300
@@ -26,12 +27,51 @@ connections = list()
 # The index of the current point in the total amount of points
 index = 0
 
+#%%
+def wiener_process(T, N, **kwargs):
+    """
+    Simulates a Wiener process.
+
+    Parameters:
+        T (float): Time horizon.
+        N (int): Number of time steps.
+
+    Returns:
+        numpy.ndarray: Array of Wiener process values.
+    """
+
+    dt = T / N
+    dW = np.sqrt(dt) * np.random.normal(0, 1, N)
+    W = np.cumsum(dW)
+    W = np.insert(W, 0, 0)  # Insert W_0 = 0 at the beginning
+
+    return W[:-1]
+
+def brownbridge_process(T,N,num_paths=1, base_curve = False):
+    process = BrownianBridge(initial=-2,end=2)
+    paths = process.simulate(n=N, N=num_paths)
+    if base_curve:
+        tvec = np.linspace(0,0.25, N)
+        
+        paths = [path + 2*np.sin(2 * np.pi * 1 * tvec) for path in paths]
+
+    print(len(paths))
+    return paths
+
+diffusion_style = 'brownbridge'
 # Create each line one after the other in a loop
-for i in range(50):
-    x.append(np.sin(t))
-    y.append(np.cos((2 + .02 * i) * t))
-    z.append(np.cos((3 + .02 * i) * t))
-    s.append(t)
+if diffusion_style == 'wiener':
+    diff_func = wiener_process
+elif diffusion_style == 'brownbridge':
+    diff_func = brownbridge_process
+
+for i in range(2):
+    x.append(diff_func(1,len(t)))
+    z.append(diff_func(1,len(t)))
+    y.append(diff_func(1,len(t),base_curve=True))
+    #s.append(t) #each streamline has time color gradient
+    s.append(i * np.ones_like(t)) #color each streamline different
+
     # This is the tricky part: in a line, each point is connected
     # to the one following it. We have to express this with the indices
     # of the final set of points once all lines have been combined
@@ -44,13 +84,14 @@ for i in range(50):
     index += N
 
 # Now collapse all positions, scalars and connections in big arrays
-x = np.hstack(x)
-y = np.hstack(y)
-z = np.hstack(z)
-s = np.hstack(s)
+x = np.hstack(x).squeeze()
+y = np.hstack(y).squeeze()
+z = np.hstack(z).squeeze()
+s = np.hstack(s).squeeze()
 connections = np.vstack(connections)
-print(f"{x.shape} vs {y.shape} vs {z.shape} vs {s.shape}")
+
 # Create the points
+print(f"{x.shape} vs {y.shape} vs {z.shape} vs {s.shape}")
 src = mlab.pipeline.scalar_scatter(x, y, z, s)
 
 # Connect them
@@ -67,3 +108,7 @@ mlab.pipeline.surface(lines, colormap='Accent', line_width=1, opacity=.4)
 mlab.view(33.6, 106, 5.5, [0, 0, .05])
 mlab.roll(125)
 mlab.show()
+#%%
+import matplotlib.pyplot as plt
+
+plt.plot(x[0,...])
