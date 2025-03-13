@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+src/synth_streamlines.egg-info/PKG-INFO
+src/synth_streamlines.egg-info/SOURCES.txt
+src/synth_streamlines.egg-info/dependency_links.txt
+src/synth_streamlines.egg-info/requires.txt
+src/synth_streamlines.egg-info/top_level.txt
+src/synth_streamlines/streams/generate.py
