@@ -10,11 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 # Update pip
 RUN pip install --upgrade pip
 
-#Install poetry official way
-#RUN curl -sSL https://install.python-poetry.org | python -
-#ENV PATH = "${PATH}:/home/vscode/.local/bin"
-
-#Install uv official way
+#Install uv MY way
 USER vscode
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH = "${PATH}:/home/vscode/.local/bin"
