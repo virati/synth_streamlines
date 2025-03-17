@@ -77,6 +77,7 @@ if use_sample_data:
     fetch_bundles_2_subjects()
 else:
     custom_trk_path = "/home/virati/Data/postdoc/um1/linc_ome/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
+    custom_trk_b0_path = "/home/virati/Data/postdoc/um1/linc_ome/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
     if trk_file is None:
         trk_file = nib.streamlines.load(custom_trk_path)
         header = trk_file.header
