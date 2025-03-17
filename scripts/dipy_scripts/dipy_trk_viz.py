@@ -1,16 +1,4 @@
 # %% Imports and Methods
-"""
-==================================
-Advanced interactive visualization
-==================================
-
-In DIPY_ we created a thin interface to access many of the capabilities
-available in the FURY 3D visualization library :footcite:p:`Garyfallidis2021`
-but tailored to the needs of structural and diffusion imaging.
-
-Let's start by importing the necessary modules.
-"""
-
 import numpy as np
 
 from dipy.data.fetcher import fetch_bundles_2_subjects, read_bundles_2_subjects
@@ -19,6 +7,7 @@ from dipy.viz import actor, ui, window
 import nibabel as nib
 
 
+# %%
 def shift_streamlines(streamlines, shift_x, shift_y, shift_z):
     for streamline in streamlines:
         for point in streamline:
@@ -50,31 +39,11 @@ def get_min_distances(streamlines, center_point):
 
 
 # %% Data Loading
-###############################################################################
-# In ``window`` we have all the objects that connect what needs to be rendered
-# to the display or the disk e.g., for saving screenshots. So, there you will
-# find key objects and functions like the ``Scene`` class which holds and
-# provides access to all the actors and the ``show`` function which displays
-# what is in the scene on a window. Also, this module provides access to
-# functions for opening/saving dialogs and printing screenshots
-# (see ``snapshot``).
-#
-# In the ``actor`` module we can find all the different primitives e.g.,
-# streamtubes, lines, image slices, etc.
-#
-# In the ``ui`` module we have some other objects which allow to add buttons
-# and sliders and these interact both with windows and actors. Because of
-# this they need input from the operating system so they can process events.
-#
-# Let's get started. In this tutorial, we will visualize some bundles
-# together with FA or T1. We will be able to change the slices using
-# a ``LineSlider2D`` widget.
-#
-# First we need to fetch and load some datasets.
 trk_file = None
 use_sample_data = False
 if use_sample_data:
     fetch_bundles_2_subjects()
+    # This loads in dipy sample data
 else:
     custom_trk_path = "/home/virati/Data/postdoc/um1/linc_ome/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
     custom_trk_b0_path = "/home/virati/Data/postdoc/um1/linc_ome/sub-I74_sample-hemi_space-CIT168_desc-CSD_tractography.trk"
@@ -82,16 +51,6 @@ else:
         trk_file = nib.streamlines.load(custom_trk_path)
         header = trk_file.header
         custom_streamlines = trk_file.streamlines
-
-
-###############################################################################
-# The following function outputs a dictionary with the required bundles e.g.
-# ``af left`` (left arcuate fasciculus) and maps, e.g. FA for a specific
-# subject.
-
-res = read_bundles_2_subjects(
-    subj_id="subj_1", metrics=["t1", "fa"], bundles=["af.left", "cst.right", "cc_1"]
-)
 
 ###############################################################################
 # We will use 3 bundles, FA and the affine transformation that brings the voxel
@@ -112,15 +71,23 @@ stream_distances = get_min_distances(ds_custom_streamlines, electrode_position)
 # %% Plotting
 # Setup the registration and plotting
 streamlines = Streamlines(ds_custom_streamlines)
-# streamlines.extend(ds_custom_streamlines)
-# streamlines = Streamlines(res["af.left"])
-streamlines.extend(res["af.left"])
-# streamlines.extend(res["cst.right"])
-# streamlines.extend(res["cc_1"])
 
+res = read_bundles_2_subjects(
+    subj_id="subj_1", metrics=["t1", "fa"], bundles=["af.left", "cst.right", "cc_1"]
+)
 data = res["fa"]
 shape = data.shape
-affine = res["affine"]
+affine = trk_file.affine  # res["affine"]
+
+# data = custom_streamlines
+# shape = data.shape
+# streamlines.extend(ds_custom_streamlines)
+# streamlines = Streamlines(res["af.left"])
+# streamlines.extend(res["af.left"])
+# streamlines.extend(res["cst.right"])
+# streamlines.extend(res["cc_1"])
+# %%
+
 
 ###############################################################################
 # With our current design it is easy to decide in which space you want the
