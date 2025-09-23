@@ -21,14 +21,14 @@ class generate_uniform_grid_streamlines:
     """
     def __init__(self,output_file, n_streamlines, grid_size):
     # Generate grid points
-        x = np.linspace(0, grid_size[0], int(np.cbrt(n_streamlines)))
-        y = np.linspace(0, grid_size[1], int(np.cbrt(n_streamlines)))
-        z = np.linspace(0, grid_size[2], int(np.cbrt(n_streamlines)))
+        x = np.linspace(-grid_size[0], grid_size[0], int(np.cbrt(n_streamlines)))
+        y = np.linspace(-grid_size[1], grid_size[1], int(np.cbrt(n_streamlines)))
+        z = np.linspace(-grid_size[2], grid_size[2], int(np.cbrt(n_streamlines)))
         self.grid_points = np.array(np.meshgrid(x, y, z)).T.reshape(-1, 3)
 
         self.mni_reference = load_mni152_template()
 
-    def gen_streamlines(self, streamline_extent = 10):
+    def gen_streamlines(self, streamline_extent = 100):
         # Create streamlines as straight lines
         streamlines = []
         grid_points = self.grid_points
@@ -41,6 +41,19 @@ class generate_uniform_grid_streamlines:
         streamlines = np.dot(np.array(streamlines), (affine[:3,:3]).T) + affine[:3,3]
 
         self.streamlines = streamlines
+        
+        return self
+    
+    def bend_streamlines(self, bend_factor = 0.1):
+        bent_streamlines = []
+        for i, sl in enumerate(self.streamlines):
+            #need to switch to alleotary? so we can get a true "bend" with endpoints fixed
+            noise = np.random.normal(scale=bend_factor * (i / len(self.streamlines)), size=sl.shape)
+            bent_sl = sl + noise
+            bent_streamlines.append(bent_sl)
+        self.streamlines = bent_streamlines
+
+        return self
 
     def save_streamlines_trk(self, save_loc = None):
         streamlines = self.streamlines 
@@ -51,11 +64,13 @@ class generate_uniform_grid_streamlines:
         save_tractogram(tractogram, save_loc)
         print(f"Saved {len(streamlines)} streamlines to {save_loc}")
 
+        return self
+
 #%%
 
 output_file = "/tmp/grid_output.trk"
-n_streamlines = 1000
+n_streamlines = 10000
 grid_size = (100, 100, 100)  # Define the size of the 3D grid
 generator = generate_uniform_grid_streamlines(output_file, n_streamlines, grid_size)
-generator.gen_streamlines()
+generator.gen_streamlines().bend_streamlines(bend_factor=5)
 generator.save_streamlines_trk(save_loc=output_file)
