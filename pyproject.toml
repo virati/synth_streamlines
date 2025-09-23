@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aleatory>=1.1.1",
     "dipy>=1.10.0",
     "fury>=0.12.0",
     "ipympl>=0.9.6",

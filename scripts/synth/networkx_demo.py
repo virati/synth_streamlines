@@ -1,3 +1,7 @@
+#%%
+%load_ext autoreload
+%autoreload 2
+#%%
 import networkx as nx
 import pyvista as pv
 import numpy as np
