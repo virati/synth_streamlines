@@ -68,8 +68,9 @@ class generate_uniform_grid_streamlines:
 
 #%%
 
-output_file = "/tmp/grid_output.trk"
-n_streamlines = 10000
+#output_file = "/tmp/grid_output.trk"
+output_file = "C:/Users/virat/grid_output_50000.trk"
+n_streamlines = 50000
 grid_size = (100, 100, 100)  # Define the size of the 3D grid
 generator = generate_uniform_grid_streamlines(output_file, n_streamlines, grid_size)
 generator.gen_streamlines().bend_streamlines(bend_factor=5)
