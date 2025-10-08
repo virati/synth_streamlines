@@ -28,7 +28,7 @@ class generate_uniform_grid_streamlines:
         return transformed_points
     
 
-    def gen_grid_streamlines(self,bounds=(-100, 100), density=1000, streamline_extent=200, axes=[0,1,2]):
+    def gen_grid_streamlines(self,bounds=(-100, 100), density=100, axes=[0,1,2], **kwargs):
         """
         Generate a list of 3D line start and end points forming a grid.
 
@@ -64,12 +64,12 @@ class generate_uniform_grid_streamlines:
                 for y in grid_vals:
                     start = (x, y, min_b)
                     end   = (x, y, max_b)
-                lines.append((start, end))
+                    lines.append((start, end))
 
         self.streamlines = self.apply_affine(lines)
         return self
     
-    def gen_det_streamlines(self, streamline_extent = 20, axes=[0,1,2]):
+    def gen_det_streamlines(self, streamline_extent = 20, axes=[0,1,2], **kwargs):
         # Create streamlines as small lines
         streamlines = []
         grid_points = self.grid_points
