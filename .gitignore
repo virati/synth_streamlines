@@ -3,3 +3,4 @@ venv/
 .egg-info
 *.png
 *.jpg
+.egg-info/
