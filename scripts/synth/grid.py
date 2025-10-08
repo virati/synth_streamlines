@@ -28,14 +28,48 @@ class generate_uniform_grid_streamlines:
 
         self.mni_reference = load_mni152_template()
 
-    def gen_det_grid(self, grid_size=(100,100,100), spacing=10):
-        # Generate grid points
-        x = np.arange(-grid_size[0]//2, grid_size[0]//2 + 1, spacing)
-        y = np.arange(-grid_size[1]//2, grid_size[1]//2 + 1, spacing)
-        z = np.arange(-grid_size[2]//2, grid_size[2]//2 + 1, spacing)
-        self.grid_points = np.array(np.meshgrid(x, y, z)).T.reshape(-1, 3)
+    def gen_det_grid_lines(self,bounds=(-100, 100), density=10, line_length=200):
+        """
+        Generate a list of 3D line start and end points forming a grid.
 
+        Parameters:
+            bounds (tuple): (min, max) bounds in each dimension.
+            density (int): Number of grid lines per axis.
+            line_length (float): Length of each line (assumed to stretch from one boundary to the other).
+
+        Returns:
+            lines (list): List of (start, end) tuples, each a pair of (x, y, z).
+        """
+        grid_vals = np.linspace(bounds[0], bounds[1], density)
+        min_b, max_b = bounds
+
+        lines = []
+        # X-direction lines
+        for y in grid_vals:
+            for z in grid_vals:
+                start = (min_b, y, z)
+                end   = (max_b, y, z)
+                lines.append((start, end))
+        # Y-direction lines
+        for x in grid_vals:
+            for z in grid_vals:
+                start = (x, min_b, z)
+                end   = (x, max_b, z)
+                lines.append((start, end))
+        # Z-direction lines
+        for x in grid_vals:
+            for y in grid_vals:
+                start = (x, y, min_b)
+                end   = (x, y, max_b)
+                lines.append((start, end))
+
+        self.streamlines = self.apply_affine(lines)
         return self
+    
+    def apply_affine(self, points):
+        affine = np.linalg.inv(self.mni_reference.affine)
+        transformed_points = np.dot(np.array(points), (affine[:3,:3]).T) + affine[:3,3]
+        return transformed_points
     
     def gen_det_streamlines(self, streamline_extent = 10, axes=[0,1,2]):
         # Create streamlines as straight lines
@@ -49,11 +83,8 @@ class generate_uniform_grid_streamlines:
                 streamlines.append(streamline)
 
         #apply affine to match reference
-        affine = np.linalg.inv(self.mni_reference.affine)
-        streamlines = np.dot(np.array(streamlines), (affine[:3,:3]).T) + affine[:3,3]
+        self.streamlines = self.apply_affine(streamlines)
 
-        self.streamlines = streamlines
-        
         return self
     def gen_rand_streamlines(self, streamline_extent = 100):
         # Create streamlines as straight lines
@@ -64,12 +95,10 @@ class generate_uniform_grid_streamlines:
             streamlines.append(streamline)
 
         #apply affine to match reference
-        affine = np.linalg.inv(self.mni_reference.affine)
-        streamlines = np.dot(np.array(streamlines), (affine[:3,:3]).T) + affine[:3,3]
+        self.streamlines = self.apply_affine(streamlines)
 
-        self.streamlines = streamlines
-        
         return self
+
     
     def bend_streamlines(self, bend_factor = 0.1):
         bent_streamlines = []
