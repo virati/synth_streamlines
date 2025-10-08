@@ -28,7 +28,34 @@ class generate_uniform_grid_streamlines:
 
         self.mni_reference = load_mni152_template()
 
-    def gen_streamlines(self, streamline_extent = 100):
+    def gen_det_grid(self, grid_size=(100,100,100), spacing=10):
+        # Generate grid points
+        x = np.arange(-grid_size[0]//2, grid_size[0]//2 + 1, spacing)
+        y = np.arange(-grid_size[1]//2, grid_size[1]//2 + 1, spacing)
+        z = np.arange(-grid_size[2]//2, grid_size[2]//2 + 1, spacing)
+        self.grid_points = np.array(np.meshgrid(x, y, z)).T.reshape(-1, 3)
+
+        return self
+    
+    def gen_det_streamlines(self, streamline_extent = 10, axes=[0,1,2]):
+        # Create streamlines as straight lines
+        streamlines = []
+        grid_points = self.grid_points
+        for axis in axes:
+            det_stream = np.array([0,0,0])
+            det_stream[axis] = 1
+            for point in grid_points:
+                streamline = np.array([point, point + det_stream * streamline_extent])
+                streamlines.append(streamline)
+
+        #apply affine to match reference
+        affine = np.linalg.inv(self.mni_reference.affine)
+        streamlines = np.dot(np.array(streamlines), (affine[:3,:3]).T) + affine[:3,3]
+
+        self.streamlines = streamlines
+        
+        return self
+    def gen_rand_streamlines(self, streamline_extent = 100):
         # Create streamlines as straight lines
         streamlines = []
         grid_points = self.grid_points
@@ -69,9 +96,10 @@ class generate_uniform_grid_streamlines:
 #%%
 
 #output_file = "/tmp/grid_output.trk"
-output_file = "C:/Users/virat/grid_output_50000.trk"
+
 n_streamlines = 50000
+output_file = f"C:/Users/virat/connectomes/synthetic/grid_output_det{n_streamlines}.trk"
 grid_size = (100, 100, 100)  # Define the size of the 3D grid
 generator = generate_uniform_grid_streamlines(output_file, n_streamlines, grid_size)
-generator.gen_streamlines().bend_streamlines(bend_factor=5)
+generator.gen_det_streamlines(streamline_extent=10, axes=[0, 1, 2])#.bend_streamlines(bend_factor=5)
 generator.save_streamlines_trk(save_loc=output_file)
