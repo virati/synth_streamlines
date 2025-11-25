@@ -1,6 +1,6 @@
 venv/
 *.pyc
-.egg-info
+*.egg-info
 *.png
 *.jpg
 .egg-info/
